@@ -1,57 +1,55 @@
- #Include "MathLib" as ML
- #Include "TextLib" as TL
- #Const TIMEOUT {{ afktimeout }} 
- #Const TIMEOUT_FREQUENCE_CHECK {{ afktimeoutfrequencecheck }}
- #Const TIMEOUT_SLEEP_DELAY {{ afktimeoutsleepdelay }}
- #Const GRACE_PERIOD {{ afkgraceperiod }}
+#Include "MathLib" as ML
+#Include "TextLib" as TL
+#Const TIMEOUT {{ afktimeout }} 
+#Const TIMEOUT_FREQUENCE_CHECK {{ afktimeoutfrequencecheck }}
+#Const TIMEOUT_SLEEP_DELAY {{ afktimeoutsleepdelay }}
+#Const GRACE_PERIOD {{ afkgraceperiod }}
 
-    Boolean isAfk(){
-        declare endTime = GameTime + TIMEOUT;
-		//log("Afk called, GameTime is ");
-		//log(GameTime);
-		//og("EndTime is: ");
-		//log(endTime);
-        while(GameTime < endTime){
-			if (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running) {
-				return False;
-			}
-			if (InputPlayer.Speed != 0) {
-				return False;
-			}
-            //log("Sleeping for 1 second");
-            sleep(TIMEOUT_SLEEP_DELAY);
-			//log("After sleep GameTime is ");
-			//log(GameTime);
-        }
-		return True;
-    }
+   Boolean isAfk(){
+	   declare endTime = GameTime + TIMEOUT;
+	   //log("Afk called, GameTime is ");
+	   //log(GameTime);
+	   //og("EndTime is: ");
+	   //log(endTime);
+	   while(GameTime < endTime){
+		    yield;
+		    if (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running) {
+			   return False;
+		    }
+		    if (InputPlayer.Speed != 0) {
+			   return False;
+		    }
+		    //log("Sleeping for 1 second");
+		    sleep(TIMEOUT_SLEEP_DELAY);
+		    //log("After sleep GameTime is ");
+		    //log(GameTime);
+	   }
+	   return True;
+   }
 
-    main(){
-        declare startTime = 0;
-        declare timePassed = 0;
+   main(){
+	   while(True){
+		   yield;
+		   if(InputPlayer == Null) continue;
 
-        while(True){
-            yield;
-            if(InputPlayer == Null) continue;
+		   if (InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
+			   //log("Player is running, checking if AFK...");
+			   if (isAfk()){
+				   TriggerPageAction("{{ id }}__Player_AFK");
+				   //log("Player is AFK, sleeping for: ");
+				   //log(GRACE_PERIOD);
+				   sleep(GRACE_PERIOD);
+			   } else {
+				   //log("Player is not AFK, sleeping for: ");
+				   //log(TIMEOUT_FREQUENCE_CHECK);
+				   sleep(TIMEOUT_FREQUENCE_CHECK);
+			   }
+		   } else {
+			   //log("Player is not running, sleeping for: ");
+			   //log(GRACE_PERIOD);
+			   sleep(GRACE_PERIOD);
+		   }
 
-			if (InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
-				//log("Player is running, checking if AFK...");
-				if (isAfk()){
-					TriggerPageAction("{{ id }}__Player_AFK");
-					//log("Player is AFK, sleeping for: ");
-					//log(GRACE_PERIOD);
-					sleep(GRACE_PERIOD);
-				} else {
-					//log("Player is not AFK, sleeping for: ");
-					//log(TIMEOUT_FREQUENCE_CHECK);
-					sleep(TIMEOUT_FREQUENCE_CHECK);
-				}
-			} else {
-				//log("Player is not running, sleeping for: ");
-				//log(GRACE_PERIOD);
-				sleep(GRACE_PERIOD);
-			}
-
-			
-        }
-    }
+		   
+	   }
+   }

@@ -7,10 +7,6 @@
 
 	Boolean isAfk(){
 		declare endTime = GameTime + TIMEOUT;
-		//log("Afk called, GameTime is ");
-		//log(GameTime);
-		//og("EndTime is: ");
-		//log(endTime);
 		while(GameTime < endTime){
 			yield;
 			if (InputPlayer.RaceState != CTmMlPlayer::ERaceState::Running) {
@@ -19,10 +15,7 @@
 			if (InputPlayer.Speed != 0) {
 				return False;
 			}
-			//log("Sleeping for 1 second");
 			sleep(TIMEOUT_SLEEP_DELAY);
-			//log("After sleep GameTime is ");
-			//log(GameTime);
 		}
 		return True;
 	}
@@ -34,25 +27,15 @@
 				sleep(GRACE_PERIOD);
 				continue;
 			}
-
 			if (InputPlayer.RaceState == CTmMlPlayer::ERaceState::Running){
-				//log("Player is running, checking if AFK...");
 				if (isAfk()){
 					TriggerPageAction("{{ id }}__Player_AFK");
-					//log("Player is AFK, sleeping for: ");
-					//log(GRACE_PERIOD);
 					sleep(GRACE_PERIOD);
 				} else {
-					//log("Player is not AFK, sleeping for: ");
-					//log(TIMEOUT_FREQUENCE_CHECK);
 					sleep(TIMEOUT_FREQUENCE_CHECK);
 				}
 			} else {
-				//log("Player is not running, sleeping for: ");
-				//log(GRACE_PERIOD);
 				sleep(GRACE_PERIOD);
 			}
-
-		   
 	   }
    }
